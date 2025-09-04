@@ -29,7 +29,7 @@ def read_root(request: Request):
     # For example: user ID, roles, etc.
     
     return JSONResponse(content={
-        "message": f"Hello, {username}! You have successfully authenticated.",
+        "message": f"Hello, User :>{username}<:! You have successfully authenticated.",
         "api_gateway_info": "This request was routed and authorized by APISIX.",
         "backend_info": "This response is from the FastAPI backend."
     })
