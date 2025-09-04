@@ -18,9 +18,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose the port on which the FastAPI application will run
-EXPOSE 8000
+EXPOSE 8200
 
 # Command to run the application using Uvicorn
 # We use the host "0.0.0.0" to make the service accessible from outside the container
 # We explicitly set the PYTHONPATH to include the parent directory of our app package.
-CMD ["/usr/local/bin/python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/usr/local/bin/python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8200"]
