@@ -3,11 +3,14 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 import requests
 from typing import Dict
+import warnings
+import urllib3
 
 app = FastAPI()
 
 # URL ของ OpenID Connect discovery endpoint ของ Casdoor
 CASDOOR_DISCOVERY_URL = "https://172.26.8.178/.well-known/openid-configuration"
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # สร้างตัวแปรสำหรับ OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -24,7 +27,8 @@ def get_jwks():
     if _jwks is None:
         # ดึงข้อมูลจาก discovery endpoint
         try:
-            res = requests.get(CASDOOR_DISCOVERY_URL, timeout=10)
+            
+            res = requests.get(CASDOOR_DISCOVERY_URL, timeout=10, verify=False) # เปลี่ยน verify เป็น False
             res.raise_for_status()
             discovery_data = res.json()
             jwks_uri = discovery_data.get("jwks_uri")
@@ -33,7 +37,7 @@ def get_jwks():
                 raise RuntimeError("jwks_uri not found in discovery endpoint")
 
             # ดึง JWKS จาก URL ที่ได้
-            jwks_res = requests.get(jwks_uri, timeout=10)
+            jwks_res = requests.get(jwks_uri, timeout=10, verify=False) # เปลี่ยน verify เป็น False
             jwks_res.raise_for_status()
             _jwks = jwks_res.json()
         except requests.exceptions.RequestException as e:
@@ -79,4 +83,13 @@ def get_protected_data(current_user: Dict = Depends(get_current_user)):
         "message": f"Hello, {current_user.get('name', 'User')}!",
         "user_id": current_user.get('sub'),
         "token_payload": current_user
+    }
+    
+@app.get("/")
+def get_data():
+    """
+    Endpoint ไม่มีการป้องกัน
+    """
+    return {
+        "message": "Hello, World!"
     }
